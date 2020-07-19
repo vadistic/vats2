@@ -1,0 +1,7 @@
+{
+  "extends": [
+    "@vadistic/eslint-config/base",
+    "@vadistic/eslint-config/rules/typecheck-off",
+    "@vadistic/eslint-config/preset/prettier"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "vats",
+  "author": "Jakub Wadas <vadistic@gmail.com>",
+  "version": "0.1.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "workspaces": [
+    "app",
+    "database",
+    "datamodel",
+    "api",
+    "nexus"
+  ],
+  "scripts": {},
+  "devDependencies": {
+    "@types/jest": "^26.0.7",
+    "@types/node": "^14.0.26",
+    "@vadistic/eslint-config": "^0.4.0",
+    "@vadistic/prettier-config": "^0.4.0",
+    "eslint": "^7.5.0",
+    "prettier": "^2.0.5",
+    "ts-node": "^8.10.2",
+    "ts-node-dev": "^1.0.0-pre.56",
+    "typescript": "^3.9.7"
+  },
+  "prettier": "@vadistic/prettier-config"
+}

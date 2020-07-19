@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app/package.json",
+      "use": "@now/next"
+    }
+  ],
+  "rewrites": []
+}

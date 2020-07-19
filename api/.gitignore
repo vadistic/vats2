@@ -1,0 +1,5 @@
+src/nexus/typegen.ts
+src/nexus/schema.graphql
+
+dist
+node_modules
