@@ -23,3 +23,6 @@ export interface _DeepNonNullArray<T> extends Array<DeepNonNull<NonNull<T>>> {}
 export type _DeepNonNullObject<T> = {
   [P in keyof T]: DeepNonNull<NonNull<T[P]>>
 }
+
+export const maybeToArr = <T>(maybeArr: Maybe<T | T[]>) =>
+  maybeArr ? (Array.isArray(maybeArr) ? maybeArr : [maybeArr]) : undefined

@@ -26,7 +26,7 @@ export const URLScalar = scalarType({
 
 export const JSONScalar = scalarType({
   ...JSONResolver,
-  name: 'JSON',
+  name: 'Json',
   asNexusMethod: 'json',
   description: `TODO`,
 })

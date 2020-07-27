@@ -1,27 +1,23 @@
-import { log } from '@nexus/logger'
 import { queryType, mutationType } from '@nexus/schema'
 
 export const Query = queryType({
   definition(t) {
     t.boolean('ok', { resolve: () => true })
 
-    t.boolean('authorizedString', {
-      // authorize: (root, args, ctx) => {
-      //   log.debug('asd', root)
-      // },
-      resolve: () => true,
-    })
-
     t.field('auth', {
       type: 'Boolean',
-      authorize: (root, args, ctx) => {
-        log.debug('authorize args', args)
+      authorize: (root, args, ctx) => {},
+      roles: false,
+      resolve: (root, args, ctx) => {
         return true
       },
-      resolve: (root, args, ctx) => {
-        log.debug('resolve args', args)
+    })
 
-        return true
+    t.field('tag', {
+      type: 'Tag',
+      nullable: true,
+      resolve: () => {
+        return null
       },
     })
   },

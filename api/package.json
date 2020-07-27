@@ -17,15 +17,17 @@
   },
   "dependencies": {
     "@nexus/logger": "^0.2.0",
-    "@nexus/schema": "^0.14.0",
-    "@prisma/client": "^2.3.0",
+    "@nexus/schema": "next",
+    "@vats/database": "0.1.0",
     "apollo-server": "^2.16.0",
     "graphql": "^15.3.0",
     "graphql-scalars": "^1.2.2",
-    "lodash": "^4.17.19"
+    "lodash": "^4.17.19",
+    "nexus-plugin-prisma": "next"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.158"
+    "@types/lodash": "^4.14.158",
+    "fs-jetpack": "^3.1.0"
   },
   "resolutions": {
     "graphql": "15.3.0"

@@ -1,3 +1,4 @@
+import { Logger } from '@nexus/logger'
 import { FieldAuthorizeResolver } from '@nexus/schema'
 import {
   RootValue,
@@ -7,6 +8,7 @@ import {
   MaybePromiseDeep,
   MaybePromise,
 } from '@nexus/schema/dist/typegenTypeHelpers'
+import { PrismaClient } from '@prisma/client'
 import { GraphQLResolveInfo } from 'graphql'
 
 import { IDInput, DeepNonNull, Maybe } from '../types'
@@ -23,7 +25,14 @@ export type UnsignedInt = number
 
 // CONTEXT
 
-export interface Context {}
+export interface Context {
+  db: PrismaClient
+  log: Logger
+}
+
+// Role
+
+export type Role = 'USER' | 'ADMIN'
 
 // PAGINATION
 

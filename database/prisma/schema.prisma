@@ -4,9 +4,7 @@ datasource db {
 }
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["transactionApi", "connectOrCreate", "middlewares", "aggregateApi"]
-
+  provider = "prisma-client-js"
 }
 
 // GLOBAL

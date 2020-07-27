@@ -3,16 +3,25 @@ import path from 'path'
 
 import * as models from '../model'
 
+import { Role } from './backing-types'
+import * as inputs from './inputs'
 import { authorizePlugin } from './plugin/authorize'
-import { timestampsProperty } from './plugin/timestamps'
-import * as scalarFilters from './scalar-filters'
-import * as scalars from './scalars'
+import { loggerPlugin } from './plugin/logger'
+import { rolesPlugin } from './plugin/roles'
+import { prisma, pluginPrisma } from './prisma'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type * as typegen from './typegen'
-
-const enchancers = [timestampsProperty]
+import type * as typegen from './typegen.gen'
 
 const plugins = [
+  loggerPlugin({}),
+  rolesPlugin<Role>({
+    backingType: 'types.Role',
+    defaultRole: 'USER',
+    getRoles: ctx => undefined,
+  }),
+  pluginPrisma({
+    prisma,
+  }),
   authorizePlugin(),
   nullabilityGuardPlugin({
     shouldGuard: true,
@@ -22,7 +31,7 @@ const plugins = [
       Boolean: () => true,
       DateTime: () => new Date(0),
       URL: () => 'http://example.com',
-      JSON: () => {},
+      Json: () => {},
       UnsignedFloat: () => 0,
       UnsignedInt: () => 0,
       Int: () => 0,
@@ -32,11 +41,11 @@ const plugins = [
 ]
 
 export const schema = makeSchema({
-  types: [enchancers, scalars, scalarFilters, models],
+  types: [inputs, models],
   plugins,
   outputs: {
-    schema: path.join(__dirname.replace(/\/dist$/, '/src'), 'schema.graphql'),
-    typegen: path.join(__dirname.replace(/\/dist$/, '/src'), 'typegen.ts'),
+    schema: path.join(__dirname.replace(/\/dist$/, '/src'), 'schema.gen.graphql'),
+    typegen: path.join(__dirname.replace(/\/dist$/, '/src'), 'typegen.gen.ts'),
   },
   typegenAutoConfig: {
     sources: [

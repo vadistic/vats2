@@ -1,12 +1,27 @@
 /* eslint-disable consistent-return */
 import { plugin } from '@nexus/schema'
-import { printedGenTypingImport, printedGenTyping } from '@nexus/schema/dist/core'
+import {
+  printedGenTypingImport,
+  printedGenTyping,
+  RootValue,
+  ArgsValue,
+  GetGen,
+  MaybePromise,
+} from '@nexus/schema/dist/core'
 import { ForbiddenError } from 'apollo-server'
+import { GraphQLResolveInfo } from 'graphql'
 
-import { logError } from '../log-error'
+import { logError } from '../helper/log-error'
+
+export type AuthorizeResolver<TypeName extends string, FieldName extends string> = (
+  root: RootValue<TypeName>,
+  args: ArgsValue<TypeName, FieldName>,
+  context: GetGen<'context'>,
+  info: GraphQLResolveInfo,
+) => MaybePromise<undefined | void | string | boolean | Error>
 
 const authorizeResolverImport = printedGenTypingImport({
-  module: './plugin/authorize-types',
+  module: './plugin/authorize',
   bindings: ['AuthorizeResolver'],
 })
 const fieldDefTypes = printedGenTyping({
