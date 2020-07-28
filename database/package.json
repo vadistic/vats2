@@ -19,6 +19,8 @@
     "@prisma/client": "^2.3.0"
   },
   "devDependencies": {
-    "@prisma/cli": "^2.3.0"
+    "@prisma/cli": "^2.3.0",
+    "@types/faker": "^4.1.12",
+    "faker": "^4.1.0"
   }
 }
