@@ -19,7 +19,7 @@ import {
 } from '../inputs/naming'
 import { AllScalarTypes, AllObjectLikeTypes, AllEnumTypes } from '../types'
 
-import { printInterface, printGlobal } from './print'
+import { printInterface, printGlobal, printImport } from './print'
 import type { PluginPrismaConfig } from './prisma'
 
 export type ModelProxyValue = {
@@ -130,7 +130,7 @@ export class SchemaBuilder {
   // ────────────────────────────────────────────────────────────────────────────────
 
   typegenImports() {
-    return `import * as Prisma from '@prisma/client'`
+    return printImport({ module: '@prisma/client', default: '* as Prisma' })
   }
 
   typegenPrismaOutputs() {

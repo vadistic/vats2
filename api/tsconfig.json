@@ -17,9 +17,7 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "declaration": true,
-    "declarationMap": true,
-
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "declarationMap": true
   },
   "include": ["src"]
 }

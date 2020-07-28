@@ -1,8 +1,8 @@
-import { PrintedGenTypingImport, PrintedGenTyping, StringLike } from '@nexus/schema/dist/core'
+import { PrintedGenTypingImportConfig, PrintedGenTyping } from '@nexus/schema/dist/core'
 
 export interface PrintInterfaceConfig {
   name: string
-  fields: string | PrintedGenTypingImport | PrintedGenTyping | StringLike[]
+  fields: string | PrintedGenTyping | (string | PrintedGenTyping)[]
 }
 
 export const printInterface = ({ name, fields }: PrintInterfaceConfig) => {
@@ -21,7 +21,7 @@ export const printInterface = ({ name, fields }: PrintInterfaceConfig) => {
   return res
 }
 
-export const printImport = ({ config }: PrintedGenTypingImport) => {
+export const printImport = (config: PrintedGenTypingImportConfig) => {
   if (config.default) {
     return `import ${config.default} from '${config.module}'`
   }

@@ -1,6 +1,7 @@
 import { CommonOutputFieldConfig, AllOutputTypes } from '@nexus/schema/dist/core'
 
 export type AllPrismaOutputs = keyof PrismaGen['outputs']
+export type PrismaModels = PrismaGen['models']
 
 export type PrismaPluginFieldConfig<
   TypeName extends string,

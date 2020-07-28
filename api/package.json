@@ -5,6 +5,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "clean": "rm -rf dist *.tsbuildinfo",
     "start": "ts-node ./src/main",
     "dev": "tsnd --ignore-watch typegen.ts --no-notify --respawn ./src/main",
     "reflect": "tsnd --ignore-watch typegen.ts --no-notify --transpile-only --respawn ./src/nexus/schema",
