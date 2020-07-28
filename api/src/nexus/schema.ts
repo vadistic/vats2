@@ -10,7 +10,8 @@ import { loggerPlugin } from './plugin/logger'
 import { rolesPlugin } from './plugin/roles'
 import { prisma, pluginPrisma } from './prisma'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type * as typegen from './typegen.gen'
+import type * as prismagen from './prisma.gen'
+import type * as typegen from './type.gen'
 
 const plugins = [
   loggerPlugin({}),
@@ -21,6 +22,9 @@ const plugins = [
   }),
   pluginPrisma({
     prisma,
+    output: {
+      typegen: './src/nexus/prisma.gen.ts',
+    },
   }),
   authorizePlugin(),
   nullabilityGuardPlugin({
@@ -45,7 +49,7 @@ export const schema = makeSchema({
   plugins,
   outputs: {
     schema: path.join(__dirname.replace(/\/dist$/, '/src'), 'schema.gen.graphql'),
-    typegen: path.join(__dirname.replace(/\/dist$/, '/src'), 'typegen.gen.ts'),
+    typegen: path.join(__dirname.replace(/\/dist$/, '/src'), 'type.gen.ts'),
   },
   typegenAutoConfig: {
     sources: [

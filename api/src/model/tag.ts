@@ -5,7 +5,7 @@ export const TagModel = objectType({
   definition(t) {
     t.custom.id()
     t.custom.createdAt({})
-    t.custom.updatedAt()
+    t.custom.updatedAt({})
     t.custom.name()
     t.custom.description({})
 

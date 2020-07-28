@@ -1,13 +1,11 @@
 import { PrintedGenTypingImport, PrintedGenTyping, StringLike } from '@nexus/schema/dist/core'
 
-import { ModelProxyValue } from './builder'
-
 export interface PrintInterfaceConfig {
   name: string
   fields: string | PrintedGenTypingImport | PrintedGenTyping | StringLike[]
 }
 
-export const pintInterface = ({ name, fields }: PrintInterfaceConfig) => {
+export const printInterface = ({ name, fields }: PrintInterfaceConfig) => {
   let res = `export interface ${name} {\n`
 
   if (Array.isArray(fields)) {
@@ -35,4 +33,10 @@ export const printImport = ({ config }: PrintedGenTypingImport) => {
   return 'INVALID_IMPORT_CONFIG'
 }
 
-export const printPrismaOutputs = (proxies: ModelProxyValue[]) => {}
+export const printGlobal = (content: string | string[]) => {
+  const inner = Array.isArray(content) ? content.join('\n\n') : content
+  return 'declare global {\n' + indent(inner) + '\n}'
+}
+
+export const indent = (content: string, level = 1) =>
+  ' '.repeat(level * 2) + content.replace(/\n/gm, '\n' + ' '.repeat(level * 2)).trim()

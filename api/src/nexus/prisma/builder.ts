@@ -4,6 +4,8 @@ import { PluginBuilderLens, AllInputTypes, AllOutputTypes, inputObjectType } fro
 import { CommonOutputFieldConfig, InputDefinitionBlock, enumType } from '@nexus/schema/dist/core'
 import { OutputPropertyFactoryConfig } from '@nexus/schema/dist/dynamicProperty'
 import { PrismaClient } from '@vats/database'
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { write } from 'fs-jetpack'
 import { DmmfTypes, DmmfDocument } from 'nexus-plugin-prisma/dist/schema/dmmf'
 
 import { logError } from '../helper/log-error'
@@ -16,6 +18,9 @@ import {
   orderByInputName,
 } from '../inputs/naming'
 import { AllScalarTypes, AllObjectLikeTypes, AllEnumTypes } from '../types'
+
+import { printInterface, printGlobal } from './print'
+import type { PluginPrismaConfig } from './prisma'
 
 export type ModelProxyValue = {
   model: DmmfTypes.Model
@@ -42,7 +47,7 @@ export class SchemaBuilder {
 
   proxies: Record<string, ModelProxyValue> = {}
 
-  constructor(prisma: PrismaClient) {
+  constructor(prisma: PrismaClient, readonly config: PluginPrismaConfig) {
     this.dmmf = new DmmfDocument((prisma as any).dmmf)
   }
 
@@ -73,7 +78,7 @@ export class SchemaBuilder {
   // ────────────────────────────────────────────────────────────────────────────────
 
   dynamicPropertyFactory({ typeDef: t, typeName }: OutputPropertyFactoryConfig<string>) {
-    const handleGet = (fieldName: any, customName?: any) => {
+    const handleGet = (fieldName: string, customName?: string) => {
       const proxy = this._getProxy(typeName, customName)
 
       if (!proxy) return
@@ -103,14 +108,18 @@ export class SchemaBuilder {
 
     return new Proxy(() => {}, {
       get(_, key) {
-        return handleGet(key)
+        if (typeof key === 'string') {
+          return handleGet(key)
+        }
       },
       apply(_, thisArg, [args]) {
         return new Proxy(
           {},
           {
             get(__, key) {
-              return handleGet(key, args)
+              if (typeof key === 'string') {
+                return handleGet(key, args)
+              }
             },
           },
         )
@@ -118,11 +127,64 @@ export class SchemaBuilder {
     })
   }
 
+  // ────────────────────────────────────────────────────────────────────────────────
+
+  typegenImports() {
+    return `import * as Prisma from '@prisma/client'`
+  }
+
+  typegenPrismaOutputs() {
+    const outputFields: string[] = this.dmmf.datamodel.models.map(
+      model =>
+        `${model.name}: {\n    ${model.fields
+          .map(f => `${f.name}: '${f.type}'`)
+          .join('\n    ')}\n  }`,
+    )
+
+    return printInterface({ name: 'PrismaOutputs', fields: outputFields })
+  }
+
+  typegenPrismaModels() {
+    const modelFields: string[] = this.dmmf.datamodel.models.map(
+      model => `${model.name}: Prisma.${model.name}`,
+    )
+
+    return printInterface({ name: 'PrismaModels', fields: modelFields })
+  }
+
+  typegenPrismaGen() {
+    return printInterface({
+      name: 'PrismaGen',
+      fields: [`outputs: PrismaOutputs`, `models: PrismaModels`],
+    })
+  }
+
+  typegen() {
+    const result = [
+      this.typegenImports(),
+      this.typegenPrismaModels(),
+      this.typegenPrismaOutputs(),
+      printGlobal(this.typegenPrismaGen()),
+    ].join('\n\n')
+
+    write(this.config.output.typegen, result)
+  }
+
   // ─────────────────────────────────────────────────────────────────
 
   buildModels(lens: PluginBuilderLens) {
     this.buildModelEnums(lens)
     this.buildModelInputs(lens)
+
+    if (this.shouldGenerateArtifacts()) {
+      this.typegen()
+    }
+  }
+
+  shouldGenerateArtifacts() {
+    const nodeEnv = process.env.NODE_ENV
+
+    return !nodeEnv || nodeEnv === 'development'
   }
 
   // ────────────────────────────────────────────────────────────────────────────────
@@ -149,7 +211,7 @@ export class SchemaBuilder {
         !field.isRequired,
       )
 
-      t.field(config?.alias || field.name, {
+      t.field(fieldName, {
         type: (config?.type || defaultScalarFilterType) as AllInputTypes,
         nullable: true,
         description: config?.description || defaultDescription,
@@ -164,7 +226,7 @@ export class SchemaBuilder {
         !field.isRequired,
       )
 
-      t.field(config?.alias || field.name, {
+      t.field(fieldName, {
         type: (config?.type || defaultScalarFilterType) as AllInputTypes,
         nullable: true,
         description: config?.description || defaultDescription,
@@ -235,6 +297,8 @@ export class SchemaBuilder {
         },
       })
 
+      addType(whereInput)
+
       const filterInput = inputObjectType({
         name: filterInputName(proxy.typeName),
         definition: t => {
@@ -243,6 +307,8 @@ export class SchemaBuilder {
           t.field('some', { type: whereInputName(proxy.typeName) })
         },
       })
+
+      addType(filterInput)
 
       const orderByInput = inputObjectType({
         name: orderByInputName(proxy.typeName),
@@ -259,8 +325,6 @@ export class SchemaBuilder {
       })
 
       addType(orderByInput)
-      addType(filterInput)
-      addType(whereInput)
     })
   }
 }
