@@ -8,19 +8,19 @@ import { PrismaClient } from '@vats/database'
 import { write } from 'fs-jetpack'
 import { DmmfTypes, DmmfDocument } from 'nexus-plugin-prisma/dist/schema/dmmf'
 
-import { logError } from '../helper/log-error'
-import { enumFilterBuilder } from '../inputs/builder'
-import { SortDirectionEnum } from '../inputs/enums'
+import { SortDirectionEnum } from '../common/enums'
 import {
   scalarFilterInputName,
   whereInputName,
   filterInputName,
   orderByInputName,
-} from '../inputs/naming'
-import { AllScalarTypes, AllObjectLikeTypes, AllEnumTypes } from '../types'
+} from '../common/naming'
+import { enumFilterBuilder } from '../common/scalar-filter-builders'
+import { AllScalarTypes, AllObjectLikeTypes, AllEnumTypes } from '../common/types'
+import { logError } from '../helper/log-error'
 
+import type { PluginPrismaConfig } from './plugin'
 import { printInterface, printGlobal, printImport } from './print'
-import type { PluginPrismaConfig } from './prisma'
 
 export type ModelProxyValue = {
   model: DmmfTypes.Model
@@ -51,14 +51,12 @@ export class SchemaBuilder {
     this.dmmf = new DmmfDocument((prisma as any).dmmf)
   }
 
-  private _getProxy(typeName: string, customName?: string) {
+  private _getProxy(typeName: string, modelName: string = typeName) {
     if (!this.proxies[typeName]) {
-      if (customName && typeof customName !== 'string') {
-        logError(`Expected string for custom model name, but got ${customName}`)
+      if (modelName && typeof modelName !== 'string') {
+        logError(`Expected string for custom model name, but got ${modelName}`)
         return undefined
       }
-
-      const modelName = customName || typeName
 
       if (!this.dmmf.hasModel(modelName)) {
         logError(`Model not found in prisma ${modelName}`)
@@ -78,26 +76,28 @@ export class SchemaBuilder {
   // ────────────────────────────────────────────────────────────────────────────────
 
   dynamicPropertyFactory({ typeDef: t, typeName }: OutputPropertyFactoryConfig<string>) {
-    const handleGet = (fieldName: string, customName?: string) => {
-      const proxy = this._getProxy(typeName, customName)
+    const handleGet = (modelField: string, modelName?: string) => {
+      const proxy = this._getProxy(typeName, modelName)
 
       if (!proxy) return
 
-      const field = proxy.model.fields.find(f => f.name === fieldName)
+      const field = proxy.model.fields.find(f => f.name === modelField)
 
       if (!field) {
-        logError(`Field ${fieldName} not found in prisma model ${proxy.model.name}`)
+        logError(`Field ${modelField} not found in prisma model ${proxy.model.name}`)
         return
       }
 
       return (config: PrismaPluginFieldConfig<string, string> = {}) => {
+        const fieldName = config.alias || field.name
+
         proxy.fields.push({
-          fieldName: config.alias || field.name,
+          fieldName,
           field,
           config,
         })
 
-        t.field(config?.alias || field.name, {
+        t.field(fieldName, {
           list: field.isList ? true : undefined,
           nullable: !field.isRequired,
           type: field.name === 'id' ? 'ID' : (field.type as AllOutputTypes),

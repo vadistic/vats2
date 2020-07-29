@@ -8,8 +8,7 @@
     "app",
     "database",
     "datamodel",
-    "api",
-    "nexus"
+    "api"
   ],
   "scripts": {},
   "devDependencies": {

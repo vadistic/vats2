@@ -20,10 +20,6 @@ export type AuthorizeResolver<TypeName extends string, FieldName extends string>
   info: GraphQLResolveInfo,
 ) => MaybePromise<undefined | void | string | boolean | Error>
 
-const authorizeResolverImport = printedGenTypingImport({
-  module: './plugin/authorize',
-  bindings: ['AuthorizeResolver'],
-})
 const fieldDefTypes = printedGenTyping({
   optional: true,
   name: 'authorize',
@@ -36,7 +32,12 @@ const fieldDefTypes = printedGenTyping({
     resolver from executing.
   `,
   type: 'AuthorizeResolver<TypeName, FieldName>',
-  imports: [authorizeResolverImport],
+  imports: [
+    printedGenTypingImport({
+      module: '../plugin/authorize',
+      bindings: ['AuthorizeResolver'],
+    }),
+  ],
 })
 
 export interface AuthorizePluginConfig {

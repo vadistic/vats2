@@ -4,7 +4,9 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["transactionApi", "middlewares"]
+
 }
 
 // GLOBAL
@@ -47,7 +49,7 @@ model Workspace {
   clients      Client[]
   candidates   Candidate[]
   applications Application[]
-  job          Job[]
+  jobs         Job[]
   tags         Tag[]
   sources      Source[]
   comments     Comment[]
@@ -177,18 +179,19 @@ model Candidate {
 }
 
 model FieldDefinition {
-  id        String       @id
-  node      Node         @relation(fields: [id], references: [id])
-  wid       String
-  workspace Workspace    @relation(fields: [wid], references: [id])
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  deletedAt DateTime?
+  id          String       @id
+  node        Node         @relation(fields: [id], references: [id])
+  wid         String
+  workspace   Workspace    @relation(fields: [wid], references: [id])
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
   //
-  name      String
+  name        String
+  description String?
   //
-  type      FieldType
-  values    FieldValue[]
+  type        FieldType
+  values      FieldValue[]
 }
 
 model FieldValue {

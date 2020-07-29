@@ -20,10 +20,20 @@ const server = new ApolloServer({
   uploads: {},
   cors: true,
   logger: apolloLogger,
-  context: () => {
+  context: async () => {
+    const [user] = await prisma.user.findMany({
+      take: 1,
+      select: { id: true, workspaces: { select: { id: true } } },
+    })
+
     return {
       db: prisma,
       log,
+      token: user && {
+        uid: user.id,
+        wid: user.workspaces[0].id,
+        roles: ['USER', 'ADMIN'],
+      },
     }
   },
 })

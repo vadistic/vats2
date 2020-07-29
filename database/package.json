@@ -8,11 +8,12 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rm -rf dist prisma/migrations",
-    "db:start": "docker rm -f vats || true && docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres --name 'vats' postgres:12",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate save --experimental && prisma migrate up --experimental",
-    "db:psql": "psql ${DATABASE_URL/?schema=*/}",
-    "db:drop": "psql ${DATABASE_URL/?schema=*/} -c \"DROP SCHEMA IF EXISTS ${DATABASE_URL/*?schema=/} CASCADE;\"",
+    "docker": "docker rm -f vats || true && docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres --name 'vats' postgres:12",
+    "generate": "prisma generate",
+    "migrate": "prisma migrate save --experimental && prisma migrate up --experimental",
+    "psql": "psql ${DATABASE_URL/?schema=*/}",
+    "drop": "psql ${DATABASE_URL/?schema=*/} -c \"DROP SCHEMA IF EXISTS ${DATABASE_URL/*?schema=/} CASCADE;\"",
+    "seed": "ts-node -T ./seed/script",
     "build": "tsc"
   },
   "dependencies": {

@@ -3,27 +3,28 @@ import path from 'path'
 
 import * as models from '../model'
 
-import { Role } from './backing-types'
-import * as inputs from './inputs'
+import { Role } from './backing'
+import * as inputs from './common'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type * as typegen from './generated/nexus'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type * as prismagen from './generated/prisma'
 import { authorizePlugin } from './plugin/authorize'
 import { loggerPlugin } from './plugin/logger'
 import { rolesPlugin } from './plugin/roles'
 import { prisma, pluginPrisma } from './prisma'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type * as prismagen from './prisma.gen'
-import type * as typegen from './type.gen'
 
 const plugins = [
   loggerPlugin({}),
   rolesPlugin<Role>({
     backingType: 'types.Role',
     defaultRole: 'USER',
-    getRoles: ctx => undefined,
+    getRoles: ctx => ctx.token?.roles,
   }),
   pluginPrisma({
     prisma,
     output: {
-      typegen: './src/nexus/prisma.gen.ts',
+      typegen: path.join(__dirname.replace(/\/dist$/, '/src'), 'generated/prisma.ts'),
     },
   }),
   authorizePlugin(),
@@ -48,13 +49,13 @@ export const schema = makeSchema({
   types: [inputs, models],
   plugins,
   outputs: {
-    schema: path.join(__dirname.replace(/\/dist$/, '/src'), 'schema.gen.graphql'),
-    typegen: path.join(__dirname.replace(/\/dist$/, '/src'), 'type.gen.ts'),
+    schema: path.join(__dirname.replace(/\/dist$/, '/src'), 'generated/schema.graphql'),
+    typegen: path.join(__dirname.replace(/\/dist$/, '/src'), 'generated/nexus.ts'),
   },
   typegenAutoConfig: {
     sources: [
       {
-        source: path.join(__dirname.replace(/\/dist$/, '/src'), 'backing-types.ts'),
+        source: path.join(__dirname.replace(/\/dist$/, '/src'), 'backing.ts'),
         alias: 'types',
       },
     ],

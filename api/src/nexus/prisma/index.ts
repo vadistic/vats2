@@ -1,2 +1,2 @@
-export * from './prisma'
+export * from './plugin'
 export * from './client'

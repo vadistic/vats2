@@ -1,7 +1,8 @@
 import { PrismaClient } from '@prisma/client'
-import { seedWorkspaces } from './workspace'
-import { seedUsers } from './user'
-import { seedCandidates } from './candidate'
+
+import { seedCandidates } from './model/candidate'
+import { seedUsers } from './model/user'
+import { seedWorkspaces } from './model/workspace'
 
 export const seed = async () => {
   const db = new PrismaClient()

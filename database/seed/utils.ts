@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import f from 'faker'
 
 export interface IdParam {
