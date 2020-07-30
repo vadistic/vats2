@@ -1,5 +1,5 @@
 {
-  "name": "@vats/api",
+  "name": "@vats/nexus",
   "author": "Jakub Wadas <vadistic@gmail.com>",
   "version": "0.1.0",
   "private": true,
@@ -7,11 +7,7 @@
   "scripts": {
     "clean": "rm -rf dist *.tsbuildinfo",
     "start": "ts-node ./src/main",
-    "dev": "tsnd --ignore-watch typegen.ts --no-notify --respawn ./src/main",
-    "reflect": "tsnd --ignore-watch typegen.ts --no-notify --transpile-only --respawn ./src/nexus/schema",
-    "gen": "ts-node  --transpile-only ./src/nexus/schema",
     "build": "tsc -P ./tsconfig.build.json",
-    "postinstall": "yarn gen",
     "format": "prettier --write src",
     "lint": "eslint --ext .ts src",
     "typecheck": "tsc -p tsconfig.json --noEmit --incremental false",
@@ -20,12 +16,11 @@
   "dependencies": {
     "@nexus/logger": "^0.2.0",
     "@nexus/schema": "next",
-    "@vats/database": "0.1.0",
-    "apollo-server": "^2.16.0",
+    "@prisma/client": "^2.3.0",
+    "fs-jetpack": "^3.1.0",
     "graphql": "^15.3.0",
     "graphql-scalars": "^1.2.2",
-    "lodash": "^4.17.19",
-    "nexus-plugin-prisma": "next"
+    "lodash": "^4.17.19"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.158"

@@ -31,6 +31,7 @@ model Node {
   notification Notification?
   field        FieldDefinition?
   workspace    Workspace?
+  test         Test?
 }
 
 model Workspace {
@@ -350,15 +351,13 @@ model Appointment {
 }
 
 model Event {
-  id        String
+  id        String    @id
   wid       String
   node      Node      @relation(fields: [id], references: [id])
   workspace Workspace @relation(fields: [wid], references: [id])
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  //
-  @@id([id, wid])
 }
 
 model Notification {
@@ -370,4 +369,14 @@ model Notification {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
   //
+}
+
+model Test {
+  id        String    @id
+  node      Node      @relation(fields: [id], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  value String?
 }

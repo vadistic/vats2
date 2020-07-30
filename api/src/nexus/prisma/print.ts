@@ -5,6 +5,9 @@ export interface PrintInterfaceConfig {
   fields: string | PrintedGenTyping | (string | PrintedGenTyping)[]
 }
 
+export const indent = (content: string, level = 1) =>
+  ' '.repeat(level * 2) + content.replace(/\n/gm, '\n' + ' '.repeat(level * 2)).trim()
+
 export const printInterface = ({ name, fields }: PrintInterfaceConfig) => {
   let res = `export interface ${name} {\n`
 
@@ -37,6 +40,3 @@ export const printGlobal = (content: string | string[]) => {
   const inner = Array.isArray(content) ? content.join('\n\n') : content
   return 'declare global {\n' + indent(inner) + '\n}'
 }
-
-export const indent = (content: string, level = 1) =>
-  ' '.repeat(level * 2) + content.replace(/\n/gm, '\n' + ' '.repeat(level * 2)).trim()
