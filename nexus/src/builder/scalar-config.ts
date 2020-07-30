@@ -10,7 +10,7 @@ import {
   numberLikeFilterBuilder,
   booleanLikeFilterBuilder,
   stringLikeFilterBuilder,
-} from './filter'
+} from './scalar-filter'
 
 export type Scalars = Record<string, GraphQLScalarType>
 

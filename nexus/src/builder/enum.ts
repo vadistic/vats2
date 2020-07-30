@@ -5,7 +5,7 @@ import type { Config } from '../plugin'
 import type { AllEnumTypes } from '../types'
 
 import type { Dmmf } from './dmmf'
-import { enumFilterBuilder } from './filter'
+import { enumFilterBuilder } from './scalar-filter'
 
 export const SortDirection = {
   ASC: 'asc',
