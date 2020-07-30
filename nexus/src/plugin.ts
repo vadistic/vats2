@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client'
 
 import { getDmmf } from './builder/dmmf'
 import { enumBuilder } from './builder/enum'
+import { Naming, naming } from './builder/naming'
 import { scalarBuilder } from './builder/scalar'
 
 export interface PluginPrismaConfig {
@@ -11,6 +12,7 @@ export interface PluginPrismaConfig {
   output?: {
     typegen: string
   }
+  naming: Partial<Naming>
 }
 
 export interface Config {
@@ -18,6 +20,7 @@ export interface Config {
   output: {
     typegen: string
   }
+  naming: Naming
 }
 
 export const pluginPrisma = (pluginPrismaConfig: PluginPrismaConfig) => {
@@ -25,6 +28,10 @@ export const pluginPrisma = (pluginPrismaConfig: PluginPrismaConfig) => {
     ...pluginPrismaConfig,
     prisma: pluginPrismaConfig.prisma ?? new PrismaClient(),
     output: pluginPrismaConfig.output ?? { typegen: 'src/prisma.generated.ts' },
+    naming: {
+      ...naming,
+      ...pluginPrismaConfig.naming,
+    },
   }
 
   const dmmf = getDmmf(config.prisma)
@@ -41,8 +48,8 @@ export const pluginPrisma = (pluginPrismaConfig: PluginPrismaConfig) => {
     },
 
     onBeforeBuild: lens => {
-      scalarBuilder(dmmf, config, lens)
-      enumBuilder(dmmf, config, lens)
+      scalarBuilder(config, dmmf, lens)
+      enumBuilder(config, dmmf, lens)
     },
   })
 }

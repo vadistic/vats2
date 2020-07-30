@@ -20,8 +20,8 @@ export const SortDirectionEnum = enumType({
 })
 
 export const enumBuilder = (
+  config: Config,
   dmmf: Dmmf,
-  _config: Config,
   { addType, hasType }: PluginBuilderLens,
 ) => {
   const enums: NexusEnumTypeDef<string>[] = []
@@ -43,12 +43,12 @@ export const enumBuilder = (
       enums.push(enumDef)
     }
 
-    const nonNulableFilterDef = enumFilterBuilder({
+    const nonNulableFilterDef = enumFilterBuilder(config, {
       type: en.name as AllEnumTypes,
       nullable: false,
     })
 
-    const nullableFilterDef = enumFilterBuilder({
+    const nullableFilterDef = enumFilterBuilder(config, {
       type: en.name as AllEnumTypes,
       nullable: true,
     })

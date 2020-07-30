@@ -13,7 +13,7 @@ describe('scalarBuilder', () => {
   const lens = mockBuilderLens()
   const config = mockConfig()
 
-  const res = scalarBuilder(dmmf, config, lens)
+  const res = scalarBuilder(config, dmmf, lens)
 
   test('ok', () => {
     expect(res).toBeDefined()

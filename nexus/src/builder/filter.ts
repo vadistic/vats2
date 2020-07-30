@@ -1,17 +1,19 @@
 import { inputObjectType, AllInputTypes } from '@nexus/schema'
 
+import type { Config } from '../plugin'
 import { AllScalarTypes, AllEnumTypes } from '../types'
 
-import { scalarFilterInputName, enumFilterInputName } from './naming'
-
-export interface ScalarFilterBuilderConfig {
+export interface ScalarFilterBuilderOptions {
   type: AllScalarTypes
   nullable: boolean
 }
 
-export const numberLikeFilterBuilder = ({ type, nullable }: ScalarFilterBuilderConfig) => {
+export const numberLikeFilterBuilder = (
+  { naming }: Config,
+  { type, nullable }: ScalarFilterBuilderOptions,
+) => {
   return inputObjectType({
-    name: scalarFilterInputName(type, nullable),
+    name: naming.scalarFilterInput(type, nullable),
 
     definition(t) {
       t.field('equals', { type, nullable: true, description: `` })
@@ -32,9 +34,12 @@ export const numberLikeFilterBuilder = ({ type, nullable }: ScalarFilterBuilderC
   })
 }
 
-export const booleanLikeFilterBuilder = ({ type, nullable }: ScalarFilterBuilderConfig) => {
+export const booleanLikeFilterBuilder = (
+  { naming }: Config,
+  { type, nullable }: ScalarFilterBuilderOptions,
+) => {
   return inputObjectType({
-    name: scalarFilterInputName(type, nullable),
+    name: naming.scalarFilterInput(type, nullable),
 
     definition(t) {
       t.field('equals', { type, nullable: true, description: `` })
@@ -50,9 +55,12 @@ export const booleanLikeFilterBuilder = ({ type, nullable }: ScalarFilterBuilder
   })
 }
 
-export const stringLikeFilterBuilder = ({ type, nullable }: ScalarFilterBuilderConfig) => {
+export const stringLikeFilterBuilder = (
+  { naming }: Config,
+  { type, nullable }: ScalarFilterBuilderOptions,
+) => {
   return inputObjectType<AllInputTypes>({
-    name: scalarFilterInputName(type, nullable),
+    name: naming.scalarFilterInput(type, nullable),
 
     definition(t) {
       t.field('equals', { type, nullable: true, description: `` })
@@ -71,14 +79,17 @@ export const stringLikeFilterBuilder = ({ type, nullable }: ScalarFilterBuilderC
   })
 }
 
-export interface EnumFilterBuilderConfig {
+export interface EnumFilterBuilderOptions {
   type: AllEnumTypes
   nullable: boolean
 }
 
-export const enumFilterBuilder = ({ type, nullable }: EnumFilterBuilderConfig) => {
+export const enumFilterBuilder = (
+  { naming }: Config,
+  { type, nullable }: EnumFilterBuilderOptions,
+) => {
   return inputObjectType({
-    name: enumFilterInputName(type, nullable),
+    name: naming.enumFilterInput(type, nullable),
 
     definition(t) {
       t.field('equals', { type, nullable: true, description: `` })

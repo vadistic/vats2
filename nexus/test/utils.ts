@@ -1,6 +1,7 @@
 import { PluginBuilderLens } from '@nexus/schema'
 import { PrismaClient } from '@prisma/client'
 
+import { naming } from '../src/builder/naming'
 import { Config } from '../src/plugin'
 
 export const mockBuilderLens = (): PluginBuilderLens => ({
@@ -19,4 +20,5 @@ export const mockConfig = (): Config => ({
   // TODO: spy?
   prisma: client,
   output: { typegen: './test/tmp/prisma.ts' },
+  naming,
 })

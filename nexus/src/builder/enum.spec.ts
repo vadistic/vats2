@@ -12,7 +12,7 @@ describe('enumBuilder', () => {
   const lens = mockBuilderLens()
   const config = mockConfig()
 
-  const res = enumBuilder(dmmf, config, lens)
+  const res = enumBuilder(config, dmmf, lens)
 
   test('ok', () => {
     expect(res).toBeDefined()

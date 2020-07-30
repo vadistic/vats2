@@ -35,12 +35,12 @@ export const buildinScalarNames = uniq([...prismaScalarNames, ...graphqlScalarNa
 
 export type FilterKind = 'number' | 'string' | 'boolean'
 
-export interface ScalarConfig {
+export interface ScalarOptions {
   filterKind: FilterKind
   as?: string | NexusScalarTypeDef<any>
 }
 
-export const scalarConfig: Record<ArrayElement<typeof buildinScalarNames>, ScalarConfig> = {
+export const scalarOptions: Record<ArrayElement<typeof buildinScalarNames>, ScalarOptions> = {
   Boolean: {
     filterKind: 'boolean',
   },

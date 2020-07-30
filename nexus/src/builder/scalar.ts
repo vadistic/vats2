@@ -8,7 +8,7 @@ import {
   JSONScalar,
   DateTimeScalar,
   buildinScalarNames,
-  scalarConfig,
+  scalarOptions,
   scalarFilterBuilder,
 } from './scalar-config'
 
@@ -16,8 +16,8 @@ import {
  * TODO: support and test custom scalar config
  */
 export const scalarBuilder = (
+  config: Config,
   dmmf: Dmmf,
-  _config: Config,
   { addType, hasType }: PluginBuilderLens,
 ) => {
   const scalars: NexusScalarTypeDef<string>[] = []
@@ -34,12 +34,15 @@ export const scalarBuilder = (
   }
 
   buildinScalarNames.forEach(scalarName => {
-    const config = scalarConfig[scalarName]
+    const options = scalarOptions[scalarName]
 
-    const type = typeof config.as === 'string' ? config.as : config.as?.value.name ?? scalarName
+    const type = typeof options.as === 'string' ? options.as : options.as?.value.name ?? scalarName
 
-    const nullableFilter = scalarFilterBuilder(config.filterKind)({ nullable: true, type })
-    const nonNullableFilter = scalarFilterBuilder(config.filterKind)({ nullable: false, type })
+    const nullableFilter = scalarFilterBuilder(options.filterKind)(config, { nullable: true, type })
+    const nonNullableFilter = scalarFilterBuilder(options.filterKind)(config, {
+      nullable: false,
+      type,
+    })
 
     if (!hasType(nullableFilter.name)) {
       addType(nullableFilter)

@@ -2,14 +2,27 @@ import { AllInputTypes, AllOutputTypes } from '@nexus/schema'
 
 import { AllScalarTypes, AllEnumTypes } from '../types'
 
-export const scalarFilterInputName = (typeName: AllScalarTypes, nullabe: boolean) =>
+const scalarFilterInputName = (typeName: AllScalarTypes, nullabe: boolean): AllInputTypes =>
   (nullabe ? `${typeName}NullableFilter` : `${typeName}Filter`) as AllInputTypes
 
-export const enumFilterInputName = (typeName: AllEnumTypes, nullabe: boolean) =>
+const enumFilterInputName = (typeName: AllEnumTypes, nullabe: boolean): AllInputTypes =>
   (nullabe ? `${typeName}NullableEnumFilter` : `${typeName}EnumFilter`) as AllInputTypes
 
-export const filterInputName = (typeName: AllOutputTypes) => `${typeName}Filter` as AllInputTypes
+const filterInputName = (typeName: AllOutputTypes): AllInputTypes =>
+  `${typeName}Filter` as AllInputTypes
 
-export const whereInputName = (typeName: AllOutputTypes) => `${typeName}Where` as AllInputTypes
+const whereInputName = (typeName: AllOutputTypes): AllInputTypes =>
+  `${typeName}Where` as AllInputTypes
 
-export const orderByInputName = (typeName: AllOutputTypes) => `${typeName}OrderBy` as AllInputTypes
+const orderByInputName = (typeName: AllOutputTypes): AllInputTypes =>
+  `${typeName}OrderBy` as AllInputTypes
+
+export const naming = {
+  scalarFilterInput: scalarFilterInputName,
+  enumFilterInput: enumFilterInputName,
+  filterInput: filterInputName,
+  whereInput: whereInputName,
+  orderByInput: orderByInputName,
+}
+
+export type Naming = typeof naming
