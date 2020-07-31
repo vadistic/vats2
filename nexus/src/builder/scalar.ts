@@ -1,59 +1,66 @@
 import { PluginBuilderLens } from '@nexus/schema'
-import type { NexusInputObjectTypeDef, NexusScalarTypeDef } from '@nexus/schema/dist/core'
+import type { NexusScalarTypeDef } from '@nexus/schema/dist/core'
 
+import { Metadata } from '../metadata/metadata'
 import type { Config } from '../plugin'
+import { AllScalarTypes } from '../types'
 
-import { Dmmf } from './dmmf'
 import {
-  JSONScalar,
-  DateTimeScalar,
   buildinScalarNames,
   scalarOptions,
-  scalarFilterBuilder,
+  getScalarFilterBuilder,
+  buildInScalarDefs,
+  ScalarOptions,
 } from './scalar-config'
 
-/*
- * TODO: support and test custom scalar config
- */
-export const scalarBuilder = (
+export const addScalars = (
   config: Config,
-  dmmf: Dmmf,
+  metadata: Metadata,
   { addType, hasType }: PluginBuilderLens,
 ) => {
-  const scalars: NexusScalarTypeDef<string>[] = []
-  const inputs: NexusInputObjectTypeDef<string>[] = []
+  const defs: NexusScalarTypeDef<string>[] = []
 
-  if (!hasType('DateTime')) {
-    addType(DateTimeScalar)
-    scalars.push(DateTimeScalar)
-  }
-
-  if (!hasType('Json')) {
-    addType(JSONScalar)
-    scalars.push(JSONScalar)
-  }
-
-  buildinScalarNames.forEach(scalarName => {
-    const options = scalarOptions[scalarName]
-
-    const type = typeof options.as === 'string' ? options.as : options.as?.value.name ?? scalarName
-
-    const nullableFilter = scalarFilterBuilder(options.filterKind)(config, { nullable: true, type })
-    const nonNullableFilter = scalarFilterBuilder(options.filterKind)(config, {
-      nullable: false,
-      type,
-    })
-
-    if (!hasType(nullableFilter.name)) {
-      addType(nullableFilter)
-      inputs.push(nullableFilter)
-    }
-
-    if (!hasType(nonNullableFilter.name)) {
-      addType(nonNullableFilter)
-      inputs.push(nonNullableFilter)
+  buildInScalarDefs.forEach(scalar => {
+    if (!hasType(scalar.name) && (config.force || metadata.refs.has(scalar.name))) {
+      addType(scalar)
+      defs.push(scalar)
     }
   })
 
-  return { scalars, inputs }
+  return defs
+}
+
+export const addScalarFilters = (
+  config: Config,
+  metadata: Metadata,
+  { addType, hasType }: PluginBuilderLens,
+) => {
+  return buildinScalarNames
+    .flatMap(name => buildScalarFilterInputs(config, name))
+    .filter(input => !hasType(input.name) && (config.force || metadata.refs.has(input.name)))
+    .map(scalarFilter => {
+      addType(scalarFilter)
+
+      return scalarFilter
+    })
+}
+
+export const buildScalarFilterInputs = (config: Config, scalarName: AllScalarTypes) => {
+  const options: ScalarOptions = scalarOptions[scalarName] || { filterKind: 'boolean' }
+
+  const type = typeof options.as === 'string' ? options.as : options.as?.value.name ?? scalarName
+
+  const scalarBuilder = getScalarFilterBuilder(options.filterKind)
+
+  const nullableFilter = scalarBuilder(config, {
+    nullable: true,
+    type,
+  })
+
+  const nonNullableFilter = scalarBuilder(config, {
+    nullable: false,
+    type,
+  })
+
+  return [nullableFilter, nonNullableFilter]
 }

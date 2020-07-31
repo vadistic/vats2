@@ -1,40 +1,53 @@
-import { plugin } from '@nexus/schema'
+import { plugin, dynamicOutputProperty } from '@nexus/schema'
 import { printedGenTypingImport } from '@nexus/schema/dist/core'
 import { PrismaClient } from '@prisma/client'
 
-import { getDmmf } from './builder/dmmf'
-import { enumBuilder } from './builder/enum'
+import { addEnums, addEnumFilters } from './builder/enum'
+import { addModelInputs } from './builder/model-input'
 import { Naming, naming } from './builder/naming'
-import { scalarBuilder } from './builder/scalar'
+import { addScalars, addScalarFilters } from './builder/scalar'
+import { getDmmf } from './metadata/dmmf'
+import { Metadata } from './metadata/metadata'
+import { metadataProxy } from './metadata/proxy'
 
 export interface PluginPrismaConfig {
   prisma?: PrismaClient
-  output?: {
-    typegen: string
-  }
-  naming: Partial<Naming>
+  output?:
+    | boolean
+    | {
+        typegen: string
+      }
+  naming?: Partial<Naming>
+  force?: boolean
 }
 
 export interface Config {
   prisma: PrismaClient
-  output: {
-    typegen: string
-  }
+  output:
+    | boolean
+    | {
+        typegen: string
+      }
   naming: Naming
+  force: boolean
 }
 
-export const pluginPrisma = (pluginPrismaConfig: PluginPrismaConfig) => {
+export const pluginPrisma = (cfg: PluginPrismaConfig) => {
   const config: Config = {
-    ...pluginPrismaConfig,
-    prisma: pluginPrismaConfig.prisma ?? new PrismaClient(),
-    output: pluginPrismaConfig.output ?? { typegen: 'src/prisma.generated.ts' },
+    ...cfg,
+    force: cfg.force ?? false,
+    prisma: cfg.prisma ?? new PrismaClient(),
+    output: cfg.output === false ? false : cfg.output ?? { typegen: 'src/prisma.generated.ts' },
     naming: {
       ...naming,
-      ...pluginPrismaConfig.naming,
+      ...cfg.naming,
     },
   }
 
   const dmmf = getDmmf(config.prisma)
+  const metadata = new Metadata(dmmf)
+
+  const proxyHandler = metadataProxy(metadata)
 
   return plugin({
     name: 'Prisma',
@@ -43,13 +56,34 @@ export const pluginPrisma = (pluginPrismaConfig: PluginPrismaConfig) => {
     ],
     onInstall() {
       return {
-        types: [],
+        types: [
+          dynamicOutputProperty({
+            name: 'model',
+            typeDefinition: 'any',
+            factory: ({ typeName, typeDef: t, stage }) => {
+              // TODO: try to runt his only once
+              return proxyHandler({
+                typeName,
+                stage,
+                build: ({ fieldName, arg, field }) => {
+                  t.field(fieldName, { ...arg, type: arg.type || field.type })
+                },
+              })
+            },
+          }),
+        ],
       }
     },
 
     onBeforeBuild: lens => {
-      scalarBuilder(config, dmmf, lens)
-      enumBuilder(config, dmmf, lens)
+      console.log(metadata.refs)
+      addScalars(config, metadata, lens)
+      addScalarFilters(config, metadata, lens)
+
+      addEnums(config, metadata, lens)
+      addEnumFilters(config, metadata, lens)
+
+      addModelInputs(config, metadata, lens)
     },
   })
 }

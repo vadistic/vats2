@@ -1,12 +1,20 @@
 /* eslint-disable consistent-return */
-import { PluginBuilderLens, plugin, inputObjectType, makeSchema } from '@nexus/schema'
+import { PluginBuilderLens, plugin, inputObjectType, makeSchema, objectType } from '@nexus/schema'
 import { PrismaClient } from '@prisma/client'
+import { DMMFClass } from '@prisma/client/runtime/dmmf'
 import { printSchema, print, buildSchema, GraphQLSchema } from 'graphql'
 
 import { naming } from '../src/builder/naming'
+import { modelToTypeMetadata } from '../src/metadata/convert'
+import { getDmmf } from '../src/metadata/dmmf'
+import { Metadata, TypeMetadata } from '../src/metadata/metadata'
 import { Config } from '../src/plugin'
 
-export const mockBuilderLens = (): PluginBuilderLens => ({
+const _client = new PrismaClient()
+const _dmmf = getDmmf(_client)
+const _metadata = new Metadata(_dmmf)
+
+export const testBuilderLens = (): PluginBuilderLens => ({
   addType: jest.fn(),
   hasType: jest.fn(() => false),
   hasConfigOption: jest.fn(() => false),
@@ -16,43 +24,35 @@ export const mockBuilderLens = (): PluginBuilderLens => ({
   }),
 })
 
-export const client = new PrismaClient()
+export const testClient = (): PrismaClient => _client
 
-export const mockConfig = (): Config => ({
+export const testDmmf = (): DMMFClass => _dmmf
+
+export const testkConfig = (): Config => ({
   // TODO: spy?
-  prisma: client,
+  prisma: _client,
   output: { typegen: './test/tmp/prisma.ts' },
   naming,
+  force: true,
 })
 
-export const mockMisingPlugin = plugin({
-  name: 'MockMissing',
-  onMissingType: (typeName, { addType }) => {
-    const isInput =
-      typeName.includes('Filter') || typeName.includes('Where') || typeName.includes('OrderBy')
+export const testMetadata = (types?: TypeMetadata[]): Metadata => {
+  const metadata = new Metadata(_dmmf)
 
-    console.log(typeName)
+  metadata.addType(modelToTypeMetadata(_dmmf.modelMap['Tag']))
 
-    if (isInput) {
-      const input = inputObjectType({
-        name: typeName,
-        definition(t) {
-          t.field('mock', { type: 'Int' })
-        },
-      })
+  if (types?.length) {
+    types.forEach(metadata.addType)
+  }
 
-      addType(input)
+  return metadata
+}
 
-      return input
-    }
-  },
-})
-
-export const mockNexus = (types: any) => {
+export const testNexus = (types: any) => {
   const schema = makeSchema({
     types,
     outputs: false,
-    plugins: [mockMisingPlugin],
+    plugins: [pluginNoopOnMissing],
   })
 
   let astSchema: GraphQLSchema
@@ -68,13 +68,46 @@ export const mockNexus = (types: any) => {
 
   return {
     getSchema,
+    getType: (typeName: string) => getSchema().getType(typeName),
     printSchema: () => printSchema(schema),
     printType: (typeName: string) => {
       const type = getSchema().getType(typeName)
 
-      if (!type || !type.astNode) return 'TYPANAME_NOT_FOUND'
+      if (!type || !type.astNode) return 'NOT_FOUND'
 
       return print(type.astNode)
     },
   }
 }
+
+export const pluginNoopOnMissing = plugin({
+  name: 'MockMissing',
+  onMissingType: (typeName, { addType }) => {
+    const isInput =
+      typeName.includes('Filter') || typeName.includes('Where') || typeName.includes('OrderBy')
+
+    if (isInput) {
+      const input = inputObjectType({
+        name: typeName,
+        definition(t) {
+          t.field('noop', { type: 'Int' })
+        },
+      })
+
+      addType(input)
+
+      return input
+    }
+
+    const object = objectType({
+      name: typeName,
+      definition(t) {
+        t.field('noop', { type: 'Int' })
+      },
+    })
+
+    addType(object)
+
+    return object
+  },
+})

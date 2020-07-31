@@ -7,9 +7,9 @@ import { uniq } from 'lodash'
 import { ArrayElement } from '../utils/types'
 
 import {
-  numberLikeFilterBuilder,
-  booleanLikeFilterBuilder,
-  stringLikeFilterBuilder,
+  buildnumberLikeFilter,
+  buildBooleanLikefilter,
+  buildStringLikefilter,
 } from './scalar-filter'
 
 export type Scalars = Record<string, GraphQLScalarType>
@@ -21,12 +21,14 @@ export const DateTimeScalar = scalarType({
   description: ``,
 })
 
-export const JSONScalar = scalarType({
+export const JsonScalar = scalarType({
   ...JSONResolver,
   name: 'Json',
   asNexusMethod: 'json',
   description: ``,
 })
+
+export const buildInScalarDefs = [JsonScalar, DateTimeScalar]
 
 export const prismaScalarNames = ['Json', 'String', 'Int', 'Float', 'DateTime', 'Boolean'] as const
 export const graphqlScalarNames = ['ID', 'String', 'Int', 'Float', 'Boolean'] as const
@@ -34,13 +36,14 @@ export const graphqlScalarNames = ['ID', 'String', 'Int', 'Float', 'Boolean'] as
 export const buildinScalarNames = uniq([...prismaScalarNames, ...graphqlScalarNames])
 
 export type FilterKind = 'number' | 'string' | 'boolean'
+export type BuildInScalarNames = ArrayElement<typeof buildinScalarNames>
 
 export interface ScalarOptions {
   filterKind: FilterKind
   as?: string | NexusScalarTypeDef<any>
 }
 
-export const scalarOptions: Record<ArrayElement<typeof buildinScalarNames>, ScalarOptions> = {
+export const scalarOptions: Record<string, ScalarOptions> = {
   Boolean: {
     filterKind: 'boolean',
   },
@@ -64,9 +67,9 @@ export const scalarOptions: Record<ArrayElement<typeof buildinScalarNames>, Scal
   },
 }
 
-export const scalarFilterBuilder = (filterKind: FilterKind) =>
+export const getScalarFilterBuilder = (filterKind: FilterKind) =>
   ({
-    number: numberLikeFilterBuilder,
-    boolean: booleanLikeFilterBuilder,
-    string: stringLikeFilterBuilder,
+    number: buildnumberLikeFilter,
+    boolean: buildBooleanLikefilter,
+    string: buildStringLikefilter,
   }[filterKind])

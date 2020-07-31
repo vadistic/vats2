@@ -1,1 +1,3 @@
-export const logError = (...message: string[]) => console.error(message.join(' '))
+export const logError = (...message: string[]) => {
+  console.error(message.join(' '))
+}

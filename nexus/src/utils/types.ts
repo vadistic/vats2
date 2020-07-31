@@ -5,3 +5,5 @@ export const maybeArg = <A, R>(fn: (arg: A) => R, arg?: A) => (arg ? fn(arg) : u
 export type Arrayable<T> = T | T[]
 
 export type ArrayElement<T> = T extends Array<infer U> ? U : never
+
+export const noopFn = (...args: any[]): any => ({})

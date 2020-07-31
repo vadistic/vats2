@@ -1,11 +1,11 @@
 import { PluginBuilderLens, enumType } from '@nexus/schema'
-import type { NexusEnumTypeDef, NexusInputObjectTypeDef } from '@nexus/schema/dist/core'
+import type { NexusEnumTypeDef } from '@nexus/schema/dist/core'
 
+import { Metadata } from '../metadata/metadata'
 import type { Config } from '../plugin'
 import type { AllEnumTypes } from '../types'
 
-import type { Dmmf } from './dmmf'
-import { enumFilterBuilder } from './scalar-filter'
+import { buildEnumFilter } from './scalar-filter'
 
 export const SortDirection = {
   ASC: 'asc',
@@ -19,50 +19,64 @@ export const SortDirectionEnum = enumType({
   members: SortDirection,
 })
 
-export const enumBuilder = (
+export const addEnums = (
   config: Config,
-  dmmf: Dmmf,
+  metadata: Metadata,
   { addType, hasType }: PluginBuilderLens,
 ) => {
-  const enums: NexusEnumTypeDef<string>[] = []
-  const inputs: NexusInputObjectTypeDef<string>[] = []
+  const defs: NexusEnumTypeDef<string>[] = []
 
-  if (hasType('SortDirection')) {
+  if (
+    !hasType(SortDirectionEnum.name) &&
+    (config.force || metadata.refs.has(SortDirectionEnum.name))
+  ) {
     addType(SortDirectionEnum)
-    enums.push(SortDirectionEnum)
+    defs.push(SortDirectionEnum)
   }
 
-  dmmf.datamodel.enums.forEach(en => {
-    if (!hasType(en.name)) {
+  metadata.dmmf.datamodel.enums.forEach(en => {
+    if (!hasType(en.name) && (config.force || metadata.refs.has(en.name))) {
       const enumDef = enumType({
         name: en.name,
         members: en.values,
       })
 
       addType(enumDef)
-      enums.push(enumDef)
-    }
-
-    const nonNulableFilterDef = enumFilterBuilder(config, {
-      type: en.name as AllEnumTypes,
-      nullable: false,
-    })
-
-    const nullableFilterDef = enumFilterBuilder(config, {
-      type: en.name as AllEnumTypes,
-      nullable: true,
-    })
-
-    if (!hasType(nonNulableFilterDef.name)) {
-      addType(nonNulableFilterDef)
-      inputs.push(nonNulableFilterDef)
-    }
-
-    if (!hasType(nullableFilterDef.name)) {
-      addType(nullableFilterDef)
-      inputs.push(nullableFilterDef)
+      defs.push(enumDef)
     }
   })
 
-  return { enums, inputs }
+  return defs
+}
+
+export const addEnumFilters = (
+  config: Config,
+  metadata: Metadata,
+  { addType, hasType }: PluginBuilderLens,
+) => {
+  return metadata.dmmf.datamodel.enums
+    .flatMap(en => buildEnumFilters(config, en.name))
+    .filter(
+      enumFilter =>
+        !hasType(enumFilter.name) && (config.force || metadata.refs.has(enumFilter.name)),
+    )
+    .map(enumFilter => {
+      addType(enumFilter)
+
+      return enumFilter
+    })
+}
+
+export const buildEnumFilters = (config: Config, enumName: AllEnumTypes) => {
+  const nullableFilter = buildEnumFilter(config, {
+    nullable: true,
+    type: enumName,
+  })
+
+  const nonNullableFilter = buildEnumFilter(config, {
+    nullable: false,
+    type: enumName,
+  })
+
+  return [nullableFilter, nonNullableFilter]
 }

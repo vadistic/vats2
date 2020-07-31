@@ -1,10 +1,27 @@
-import { inputObjectType } from '@nexus/schema'
-import type { NexusInputFieldConfig, AllInputTypes } from '@nexus/schema/dist/core'
+import { inputObjectType, PluginBuilderLens, AllInputTypes } from '@nexus/schema'
+import type { NexusInputFieldConfig } from '@nexus/schema/dist/core'
 
-import { Config } from '../plugin'
+import type { TypeMetadata, FieldMetadata, Metadata } from '../metadata/metadata'
+import type { Config } from '../plugin'
 
 import { SortDirectionEnum } from './enum'
-import { TypeMetadata, FieldMetadata } from './metadata'
+
+export const addModelInputs = (
+  config: Config,
+  metadata: Metadata,
+  { addType, hasType }: PluginBuilderLens,
+) => {
+  return metadata.types
+    .flatMap(typeMetadata => modelInputBuilder(config, typeMetadata))
+    .filter(input => {
+      if (!hasType(input.name) && (config.force || metadata.refs.has(input.name))) {
+        addType(input)
+        return true
+      }
+
+      return false
+    })
+}
 
 export const modelInputBuilder = (config: Config, typeMetadata: TypeMetadata) => {
   const whereInput = modelWhereInputBuilder(config, typeMetadata)
@@ -21,7 +38,7 @@ export const modelWhereInputBuilder = (config: Config, typeMetadata: TypeMetadat
     name: whereInputName,
     definition: t => {
       typeMetadata.fields.forEach(fieldMetadata => {
-        const fieldConfig = filterFieldConfig(config, typeMetadata, fieldMetadata)
+        const fieldConfig = whereFieldBuilder(config, typeMetadata, fieldMetadata)
 
         if (fieldConfig) {
           t.field(fieldMetadata.fieldName, fieldConfig)
@@ -89,14 +106,15 @@ export const modelOrderByInput = (config: Config, typeMetadata: TypeMetadata) =>
   return orderByInput
 }
 
-export const filterFieldConfig = (
+export const whereFieldBuilder = (
   { naming }: Config,
   { typeName }: TypeMetadata,
-  { fieldName, field, args }: FieldMetadata,
+  { fieldName, field, arg: args }: FieldMetadata,
 ): NexusInputFieldConfig<string, string> | undefined => {
   const description = args?.description ?? `Filter by ${typeName}'s ${fieldName}`
 
   const type = (args.type || field.type) as AllInputTypes
+  const list = !!(args.list ?? field.isList)
 
   if (field.kind === 'enum') {
     const enumFilterInputName = naming.enumFilterInput(type, !field.isRequired)
@@ -118,5 +136,15 @@ export const filterFieldConfig = (
     }
   }
 
-  // TODO: relations
+  if (field.kind === 'object') {
+    const objectFilterInputName = list ? naming.filterInput(type) : naming.whereInput(type)
+
+    return {
+      type: objectFilterInputName,
+      nullable: true,
+      description,
+    }
+  }
+
+  return undefined
 }

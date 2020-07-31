@@ -1,6 +1,5 @@
+import { getDmmf, Dmmf } from '../metadata/dmmf'
 import type { PluginPrismaConfig } from '../plugin'
-
-import { getDmmf, Dmmf } from './dmmf'
 
 export class Builder {
   readonly dmmf: Dmmf

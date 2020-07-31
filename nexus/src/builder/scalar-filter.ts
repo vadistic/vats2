@@ -8,7 +8,7 @@ export interface ScalarFilterBuilderOptions {
   nullable: boolean
 }
 
-export const numberLikeFilterBuilder = (
+export const buildnumberLikeFilter = (
   { naming }: Config,
   { type, nullable }: ScalarFilterBuilderOptions,
 ) => {
@@ -34,7 +34,7 @@ export const numberLikeFilterBuilder = (
   })
 }
 
-export const booleanLikeFilterBuilder = (
+export const buildBooleanLikefilter = (
   { naming }: Config,
   { type, nullable }: ScalarFilterBuilderOptions,
 ) => {
@@ -55,7 +55,7 @@ export const booleanLikeFilterBuilder = (
   })
 }
 
-export const stringLikeFilterBuilder = (
+export const buildStringLikefilter = (
   { naming }: Config,
   { type, nullable }: ScalarFilterBuilderOptions,
 ) => {
@@ -84,7 +84,7 @@ export interface EnumFilterBuilderOptions {
   nullable: boolean
 }
 
-export const enumFilterBuilder = (
+export const buildEnumFilter = (
   { naming }: Config,
   { type, nullable }: EnumFilterBuilderOptions,
 ) => {

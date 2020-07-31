@@ -1,20 +1,20 @@
-import { mockConfig, mockNexus } from '../../test/utils'
+import { testkConfig, testNexus } from '../../test/utils'
+import { modelToTypeMetadata } from '../metadata/convert'
+import { getDmmf } from '../metadata/dmmf'
 
-import { getDmmf } from './dmmf'
-import { modelToMetadata } from './metadata'
 import { modelOrderByInput, modelFilterInputBuilder, modelWhereInputBuilder } from './model-input'
 
-describe('modelInputBuilder', () => {
-  const config = mockConfig()
+describe('model inputs', () => {
+  const config = testkConfig()
   const dmmf = getDmmf()
 
-  const tagMetadata = modelToMetadata(dmmf.modelMap['Tag'])
+  const tagMetadata = modelToTypeMetadata(dmmf.modelMap['Tag'])
 
   const whereInput = modelWhereInputBuilder(config, tagMetadata)
   const filterInput = modelFilterInputBuilder(config, tagMetadata)
   const orderByInput = modelOrderByInput(config, tagMetadata)
 
-  const nexus = mockNexus([whereInput, filterInput, orderByInput])
+  const nexus = testNexus([whereInput, filterInput, orderByInput])
 
   test('ok', () => {
     expect(whereInput).toBeDefined()
@@ -29,6 +29,10 @@ describe('modelInputBuilder', () => {
         id: StringFilter
         \\"\\"\\"Filter by Tag's wid\\"\\"\\"
         wid: StringFilter
+        \\"\\"\\"Filter by Tag's node\\"\\"\\"
+        node: NodeWhere
+        \\"\\"\\"Filter by Tag's workspace\\"\\"\\"
+        workspace: WorkspaceWhere
         \\"\\"\\"Filter by Tag's createdAt\\"\\"\\"
         createdAt: DateTimeFilter
         \\"\\"\\"Filter by Tag's updatedAt\\"\\"\\"
@@ -41,6 +45,8 @@ describe('modelInputBuilder', () => {
         description: StringNullableFilter
         \\"\\"\\"Filter by Tag's types\\"\\"\\"
         types: TagTypeNullableEnumFilter
+        \\"\\"\\"Filter by Tag's candidates\\"\\"\\"
+        candidates: CandidateFilter
         \\"\\"\\"\\"\\"\\"
         AND: [TagWhere!]
         \\"\\"\\"\\"\\"\\"

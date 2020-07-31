@@ -1,37 +1,37 @@
-import { makeSchema } from '@nexus/schema'
-import { printSchema } from 'graphql'
+import { testBuilderLens, testkConfig, testMetadata, testNexus } from '../../test/utils'
 
-import { mockBuilderLens, mockConfig } from '../../test/utils'
-
-import { getDmmf } from './dmmf'
-import { scalarBuilder } from './scalar'
+import { addScalars, addScalarFilters } from './scalar'
 import { buildinScalarNames } from './scalar-config'
 
-describe('scalarBuilder', () => {
-  const dmmf = getDmmf()
+describe('scalars', () => {
+  const metadata = testMetadata()
+  const config = testkConfig()
 
-  const lens = mockBuilderLens()
-  const config = mockConfig()
+  const scalarsLens = testBuilderLens()
+  const scalarFilterLens = testBuilderLens()
 
-  const res = scalarBuilder(config, dmmf, lens)
+  const scalars = addScalars(config, metadata, scalarsLens)
+  const scalarFilters = addScalarFilters(config, metadata, scalarFilterLens)
+
+  const nexus = testNexus([...scalars, ...scalarFilters])
 
   test('ok', () => {
-    expect(res).toBeDefined()
-    expect(res.inputs.length).toBe(buildinScalarNames.length * 2)
-    expect(res.scalars.length).toBe(2)
+    expect(scalars).toBeDefined()
+    expect(scalarFilters).toBeDefined()
+  })
 
-    expect(lens.addType).toHaveBeenCalledTimes(res.scalars.length + res.inputs.length)
+  test('add types', () => {
+    expect(scalarsLens.addType).toHaveBeenCalledTimes(2)
+    expect(scalarFilterLens.addType).toHaveBeenCalledTimes(buildinScalarNames.length * 2)
   })
 
   test('print', () => {
-    const schema = makeSchema({ types: res, outputs: false })
-
-    expect(printSchema(schema)).toMatchInlineSnapshot(`
+    expect(nexus.printSchema()).toMatchInlineSnapshot(`
       "\\"\\"\\"\\"\\"\\"
-      scalar DateTime
+      scalar Json
 
       \\"\\"\\"\\"\\"\\"
-      scalar Json
+      scalar DateTime
 
       input JsonNullableFilter {
         \\"\\"\\"\\"\\"\\"
@@ -341,7 +341,7 @@ describe('scalarBuilder', () => {
       }
 
       type Query {
-        ok: Boolean!
+        noop: Int!
       }
       "
     `)
