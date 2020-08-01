@@ -1,10 +1,11 @@
 import { makeSchema, nullabilityGuardPlugin } from '@nexus/schema'
+import { pluginPrisma } from '@vats/nexus'
 import path from 'path'
 
 import * as models from '../model'
+import { prisma } from '../prisma'
 
 import { Role } from './backing'
-import * as inputs from './common'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type * as typegen from './generated/nexus'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -12,7 +13,6 @@ import type * as prismagen from './generated/prisma'
 import { authorizePlugin } from './plugin/authorize'
 import { loggerPlugin } from './plugin/logger'
 import { rolesPlugin } from './plugin/roles'
-import { prisma, pluginPrisma } from './prisma'
 
 const plugins = [
   loggerPlugin({}),
@@ -24,33 +24,34 @@ const plugins = [
   pluginPrisma({
     prisma,
     output: {
-      typegen: path.join(__dirname.replace(/\/dist$/, '/src'), 'generated/prisma.ts'),
+      typegen: path.join(__dirname.replace(/\/dist$/, '/src'), '../generated/prisma.ts'),
     },
+    idType: 'ID',
   }),
   authorizePlugin(),
   nullabilityGuardPlugin({
     shouldGuard: true,
     fallbackValues: {
-      String: () => '',
-      ID: () => 'MISSING_ID',
-      Boolean: () => true,
-      DateTime: () => new Date(0),
-      URL: () => 'http://example.com',
-      Json: () => {},
-      UnsignedFloat: () => 0,
-      UnsignedInt: () => 0,
-      Int: () => 0,
-      Float: () => 0,
+      // String: () => '',
+      // ID: () => 'MISSING_ID',
+      // Boolean: () => true,
+      // DateTime: () => new Date(0),
+      // URL: () => 'http://example.com',
+      // Json: () => {},
+      // UnsignedFloat: () => 0,
+      // UnsignedInt: () => 0,
+      // Int: () => 0,
+      // Float: () => 0,
     },
   }),
 ]
 
 export const schema = makeSchema({
-  types: [inputs, models],
+  types: [models],
   plugins,
   outputs: {
-    schema: path.join(__dirname.replace(/\/dist$/, '/src'), 'generated/schema.graphql'),
-    typegen: path.join(__dirname.replace(/\/dist$/, '/src'), 'generated/nexus.ts'),
+    schema: path.join(__dirname.replace(/\/dist$/, '/src'), '../generated/schema.graphql'),
+    typegen: path.join(__dirname.replace(/\/dist$/, '/src'), '../generated/nexus.ts'),
   },
   typegenAutoConfig: {
     sources: [

@@ -1,11 +1,11 @@
-import { testBuilderLens, testkConfig, testNexus, testMetadata } from '../../test/utils'
+import { testBuilderLens, testConfig, testNexus, testMetadata } from '../../test/utils'
 
 import { addEnums, addEnumFilters } from './enum'
 import { naming } from './naming'
 
 describe('enums', () => {
   const metadata = testMetadata()
-  const config = testkConfig()
+  const config = testConfig()
 
   const enumsLens = testBuilderLens()
   const enumFiltersLens = testBuilderLens()

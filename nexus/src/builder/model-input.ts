@@ -1,8 +1,8 @@
 import { inputObjectType, PluginBuilderLens, AllInputTypes } from '@nexus/schema'
 import type { NexusInputFieldConfig } from '@nexus/schema/dist/core'
 
+import { Config } from '../config'
 import type { TypeMetadata, FieldMetadata, Metadata } from '../metadata/metadata'
-import type { Config } from '../plugin'
 
 import { SortDirectionEnum } from './enum'
 

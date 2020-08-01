@@ -3,15 +3,15 @@ import { objectType } from '@nexus/schema'
 export const CandidateModel = objectType({
   name: 'Candidate',
   definition(t) {
-    t.custom.id()
-    t.custom.createdAt()
-    t.custom.updatedAt()
+    t.model.id()
+    t.model.createdAt()
+    t.model.updatedAt()
 
-    t.custom.firstName()
-    t.custom.lastName()
-    t.custom.headline()
-    t.custom.phones()
-    t.custom.links()
-    t.custom.emails()
+    t.model.firstName()
+    t.model.lastName()
+    t.model.headline()
+    t.model.phones()
+    t.model.links()
+    t.model.emails()
   },
 })

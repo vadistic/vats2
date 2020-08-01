@@ -3,22 +3,22 @@ import { objectType } from '@nexus/schema'
 export const FieldDefinitionModel = objectType({
   name: 'FieldDefinition',
   definition(t) {
-    t.custom.id()
-    t.custom.createdAt()
-    t.custom.updatedAt()
+    t.model.id()
+    t.model.createdAt()
+    t.model.updatedAt()
 
-    t.custom.name()
-    t.custom.description()
+    t.model.name()
+    t.model.description()
 
-    t.custom.type()
+    t.model.type()
   },
 })
 
 export const FieldValueModel = objectType({
   name: 'FieldValue',
   definition(t) {
-    t.custom.value()
+    t.model.value()
 
-    t.custom.definition()
+    t.model.definition()
   },
 })

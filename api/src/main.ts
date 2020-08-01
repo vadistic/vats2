@@ -1,8 +1,8 @@
 import { log } from '@nexus/logger'
 import { ApolloServer } from 'apollo-server'
 
-import { prisma } from './nexus/prisma'
 import { schema } from './nexus/schema'
+import { prisma } from './prisma'
 
 const apolloLog = log.child('apollo')
 

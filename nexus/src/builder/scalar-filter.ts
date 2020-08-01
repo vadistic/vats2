@@ -1,6 +1,6 @@
 import { inputObjectType, AllInputTypes } from '@nexus/schema'
 
-import type { Config } from '../plugin'
+import { Config } from '../config'
 import { AllScalarTypes, AllEnumTypes } from '../types'
 
 export interface ScalarFilterBuilderOptions {
@@ -8,7 +8,7 @@ export interface ScalarFilterBuilderOptions {
   nullable: boolean
 }
 
-export const buildnumberLikeFilter = (
+export const buildNumberLikeFilter = (
   { naming }: Config,
   { type, nullable }: ScalarFilterBuilderOptions,
 ) => {
@@ -34,7 +34,7 @@ export const buildnumberLikeFilter = (
   })
 }
 
-export const buildBooleanLikefilter = (
+export const buildBooleanLikeFilter = (
   { naming }: Config,
   { type, nullable }: ScalarFilterBuilderOptions,
 ) => {
@@ -55,7 +55,7 @@ export const buildBooleanLikefilter = (
   })
 }
 
-export const buildStringLikefilter = (
+export const buildStringLikeFilter = (
   { naming }: Config,
   { type, nullable }: ScalarFilterBuilderOptions,
 ) => {

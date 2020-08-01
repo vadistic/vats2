@@ -1,11 +1,11 @@
-import { testkConfig, testNexus } from '../../test/utils'
+import { testConfig, testNexus } from '../../test/utils'
 import { modelToTypeMetadata } from '../metadata/convert'
 import { getDmmf } from '../metadata/dmmf'
 
 import { modelOrderByInput, modelFilterInputBuilder, modelWhereInputBuilder } from './model-input'
 
 describe('model inputs', () => {
-  const config = testkConfig()
+  const config = testConfig()
   const dmmf = getDmmf()
 
   const tagMetadata = modelToTypeMetadata(dmmf.modelMap['Tag'])

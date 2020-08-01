@@ -4,15 +4,13 @@ import { PrismaClient } from '@prisma/client'
 import { DMMFClass } from '@prisma/client/runtime/dmmf'
 import { printSchema, print, buildSchema, GraphQLSchema } from 'graphql'
 
-import { naming } from '../src/builder/naming'
+import { Config, pluginPrismaDefaultConfig } from '../src/config'
 import { modelToTypeMetadata } from '../src/metadata/convert'
 import { getDmmf } from '../src/metadata/dmmf'
 import { Metadata, TypeMetadata } from '../src/metadata/metadata'
-import { Config } from '../src/plugin'
 
 const _client = new PrismaClient()
 const _dmmf = getDmmf(_client)
-const _metadata = new Metadata(_dmmf)
 
 export const testBuilderLens = (): PluginBuilderLens => ({
   addType: jest.fn(),
@@ -28,11 +26,9 @@ export const testClient = (): PrismaClient => _client
 
 export const testDmmf = (): DMMFClass => _dmmf
 
-export const testkConfig = (): Config => ({
-  // TODO: spy?
-  prisma: _client,
+export const testConfig = (): Config => ({
+  ...pluginPrismaDefaultConfig,
   output: { typegen: './test/tmp/prisma.ts' },
-  naming,
   force: true,
 })
 

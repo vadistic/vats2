@@ -3,13 +3,13 @@ import { objectType } from '@nexus/schema'
 export const WorkspaceModel = objectType({
   name: 'Workspace',
   definition(t) {
-    t.custom.id()
-    t.custom.createdAt()
-    t.custom.updatedAt()
+    t.model.id()
+    t.model.createdAt()
+    t.model.updatedAt()
 
-    t.custom.name()
-    t.custom.description()
-    t.custom.website()
-    t.custom.type()
+    t.model.name()
+    t.model.description()
+    t.model.website()
+    t.model.type()
   },
 })

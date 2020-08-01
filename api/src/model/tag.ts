@@ -1,17 +1,15 @@
 import { objectType, extendType, arg } from '@nexus/schema'
 
-import { findManyTransformArgs, findManyArgs } from '../nexus/common/args'
-
 export const TagModel = objectType({
   name: 'Tag',
   definition(t) {
-    t.custom.id()
-    t.custom.createdAt({})
-    t.custom.updatedAt({})
-    t.custom.name()
-    t.custom.description({})
+    t.model.id()
+    t.model.createdAt({})
+    t.model.updatedAt({})
+    t.model.name()
+    t.model.description({})
 
-    t.custom.candidates()
+    t.model.candidates()
   },
 })
 
@@ -21,10 +19,6 @@ export const TagQuery = extendType({
     t.field('tags', {
       type: 'Tag',
       list: true,
-      args: findManyArgs('Tag'),
-      resolve: (_, args, ctx) => {
-        return ctx.db.tag.findMany(findManyTransformArgs(ctx, args))
-      },
     })
   },
 })

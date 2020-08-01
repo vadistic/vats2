@@ -7,9 +7,9 @@ import { uniq } from 'lodash'
 import { ArrayElement } from '../utils/types'
 
 import {
-  buildnumberLikeFilter,
-  buildBooleanLikefilter,
-  buildStringLikefilter,
+  buildNumberLikeFilter,
+  buildBooleanLikeFilter,
+  buildStringLikeFilter,
 } from './scalar-filter'
 
 export type Scalars = Record<string, GraphQLScalarType>
@@ -34,12 +34,12 @@ export const prismaScalarNames = ['Json', 'String', 'Int', 'Float', 'DateTime', 
 export const graphqlScalarNames = ['ID', 'String', 'Int', 'Float', 'Boolean'] as const
 
 export const buildinScalarNames = uniq([...prismaScalarNames, ...graphqlScalarNames])
-
-export type FilterKind = 'number' | 'string' | 'boolean'
 export type BuildInScalarNames = ArrayElement<typeof buildinScalarNames>
 
+export type ScalarFilterKind = 'number' | 'string' | 'boolean'
+
 export interface ScalarOptions {
-  filterKind: FilterKind
+  filterKind: ScalarFilterKind
   as?: string | NexusScalarTypeDef<any>
 }
 
@@ -67,9 +67,9 @@ export const scalarOptions: Record<string, ScalarOptions> = {
   },
 }
 
-export const getScalarFilterBuilder = (filterKind: FilterKind) =>
+export const scalarFilterKindToBuilder = (filterKind: ScalarFilterKind) =>
   ({
-    number: buildnumberLikeFilter,
-    boolean: buildBooleanLikefilter,
-    string: buildStringLikefilter,
+    number: buildNumberLikeFilter,
+    boolean: buildBooleanLikeFilter,
+    string: buildStringLikeFilter,
   }[filterKind])

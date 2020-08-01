@@ -1,14 +1,14 @@
 import { PluginBuilderLens } from '@nexus/schema'
 import type { NexusScalarTypeDef } from '@nexus/schema/dist/core'
 
+import { Config } from '../config'
 import { Metadata } from '../metadata/metadata'
-import type { Config } from '../plugin'
 import { AllScalarTypes } from '../types'
 
 import {
   buildinScalarNames,
   scalarOptions,
-  getScalarFilterBuilder,
+  scalarFilterKindToBuilder,
   buildInScalarDefs,
   ScalarOptions,
 } from './scalar-config'
@@ -50,7 +50,7 @@ export const buildScalarFilterInputs = (config: Config, scalarName: AllScalarTyp
 
   const type = typeof options.as === 'string' ? options.as : options.as?.value.name ?? scalarName
 
-  const scalarBuilder = getScalarFilterBuilder(options.filterKind)
+  const scalarBuilder = scalarFilterKindToBuilder(options.filterKind)
 
   const nullableFilter = scalarBuilder(config, {
     nullable: true,

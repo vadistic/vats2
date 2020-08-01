@@ -1,11 +1,11 @@
-import { testBuilderLens, testkConfig, testMetadata, testNexus } from '../../test/utils'
+import { testBuilderLens, testConfig, testMetadata, testNexus } from '../../test/utils'
 
 import { addScalars, addScalarFilters } from './scalar'
 import { buildinScalarNames } from './scalar-config'
 
 describe('scalars', () => {
   const metadata = testMetadata()
-  const config = testkConfig()
+  const config = testConfig()
 
   const scalarsLens = testBuilderLens()
   const scalarFilterLens = testBuilderLens()

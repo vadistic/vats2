@@ -21,6 +21,7 @@
     "@nexus/logger": "^0.2.0",
     "@nexus/schema": "next",
     "@vats/database": "0.1.0",
+    "@vats/nexus": "0.1.0",
     "apollo-server": "^2.16.0",
     "graphql": "^15.3.0",
     "graphql-scalars": "^1.2.2",

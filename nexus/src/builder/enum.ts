@@ -1,9 +1,8 @@
 import { PluginBuilderLens, enumType } from '@nexus/schema'
 import type { NexusEnumTypeDef } from '@nexus/schema/dist/core'
 
+import { Config } from '../config'
 import { Metadata } from '../metadata/metadata'
-import type { Config } from '../plugin'
-import type { AllEnumTypes } from '../types'
 
 import { buildEnumFilter } from './scalar-filter'
 
@@ -55,7 +54,16 @@ export const addEnumFilters = (
   { addType, hasType }: PluginBuilderLens,
 ) => {
   return metadata.dmmf.datamodel.enums
-    .flatMap(en => buildEnumFilters(config, en.name))
+    .flatMap(en => [
+      buildEnumFilter(config, {
+        nullable: true,
+        type: en.name,
+      }),
+      buildEnumFilter(config, {
+        nullable: false,
+        type: en.name,
+      }),
+    ])
     .filter(
       enumFilter =>
         !hasType(enumFilter.name) && (config.force || metadata.refs.has(enumFilter.name)),
@@ -65,18 +73,4 @@ export const addEnumFilters = (
 
       return enumFilter
     })
-}
-
-export const buildEnumFilters = (config: Config, enumName: AllEnumTypes) => {
-  const nullableFilter = buildEnumFilter(config, {
-    nullable: true,
-    type: enumName,
-  })
-
-  const nonNullableFilter = buildEnumFilter(config, {
-    nullable: false,
-    type: enumName,
-  })
-
-  return [nullableFilter, nonNullableFilter]
 }

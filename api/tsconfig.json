@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "moduleResolution": "node",
     "module": "commonjs",
     "target": "es2018",
@@ -17,7 +18,11 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+
+    "paths": {
+      "@vats/nexus": ["../nexus/src"]
+    }
   },
   "include": ["src"]
 }

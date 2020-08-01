@@ -14,7 +14,7 @@ export interface MetadataProxyCollectProps {
 export interface MetadataProxyHandlerProps {
   typeName: string
   stage: 'walk' | 'build'
-  build?: (fieldMetadata: FieldMetadata, typeMetadata: TypeMetadata) => void
+  callback?: (fieldMetadata: FieldMetadata, typeMetadata: TypeMetadata) => void
 }
 
 export const metadataProxy = (metadata: Metadata) => {
@@ -66,8 +66,8 @@ export const metadataProxy = (metadata: Metadata) => {
     return [fieldMetadata, typeMetadata] as const
   }
 
-  const handler = ({ stage, typeName, build }: MetadataProxyHandlerProps) =>
-    new Proxy(noopFn, {
+  const handler = ({ stage, typeName, callback }: MetadataProxyHandlerProps) =>
+    new Proxy(noopFn as any, {
       get(_, key) {
         return (arg?: any) => {
           if (typeof key === 'string') {
@@ -77,7 +77,7 @@ export const metadataProxy = (metadata: Metadata) => {
               arg,
             })
 
-            if (build && metadatas) build(...metadatas)
+            if (callback && metadatas) callback(...metadatas)
           }
         }
       },
@@ -95,7 +95,7 @@ export const metadataProxy = (metadata: Metadata) => {
                     modelName,
                   })
 
-                  if (build && metadatas) build(...metadatas)
+                  if (callback && metadatas) callback(...metadatas)
                 }
               }
             },

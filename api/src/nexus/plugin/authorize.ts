@@ -34,7 +34,7 @@ const fieldDefTypes = printedGenTyping({
   type: 'AuthorizeResolver<TypeName, FieldName>',
   imports: [
     printedGenTypingImport({
-      module: '../plugin/authorize',
+      module: '../nexus/plugin/authorize',
       bindings: ['AuthorizeResolver'],
     }),
   ],

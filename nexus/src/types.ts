@@ -7,6 +7,12 @@ export type AllInterfaceTypes = GetGen<'interfaceNames'>
 export type AllUnionTypes = GetGen<'unionNames'>
 export type AllObjectLikeTypes = AllObjectTypes | AllInterfaceTypes
 
+export type ID = string
+
+export type IDInput = {
+  id: ID
+}
+
 export type Context = GetGen<'context'>
 
 export type AllPrismaOutputTypes = keyof PrismaGen['outputs']
